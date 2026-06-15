@@ -6,10 +6,22 @@
 
 ## 프로젝트 개요
 - RFP(제안요청서) 문서를 RAG(Retrieval-Augmented Generation)로 처리하는 시스템
-- (추가 정보는 프로젝트 진행하면서 업데이트 예정)
+- 자세한 내용: `docs/project_plan.md`
 
 ## 기술 스택
-- (추후 업데이트)
+- LLM: OpenAI gpt-4o-mini
+- 임베딩: OpenAI text-embedding-3-small / Cohere embed-multilingual-v3.0
+- Re-ranker: Cohere Rerank
+- Vector DB: Chroma (Phase 1~3) → Supabase (Phase 4)
+- 백엔드: FastAPI
+- 프론트엔드: React (Vite)
+- 배포: Docker + AWS
+- 자세한 내용: `docs/tech_spec.md`
+
+## 주요 문서
+- 프로젝트 기획서: `docs/project_plan.md`
+- 기술 기획서: `docs/tech_spec.md`
+- 기술 의사결정 문서: `docs/decisions/` (로컬 전용, GitHub 비공개)
 
 ## Git 커밋 규칙
 - 커밋 메시지는 **한국어**로 작성

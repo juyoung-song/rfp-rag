@@ -1,0 +1,24 @@
+# 기술 의사결정 문서 (포트폴리오용 로컬 전용)
+docs/decisions/
+
+# 환경 변수
+.env
+.env.*
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+venv/
+env/
+
+# 데이터 파일 (원본 RFP 문서 - 외부 공유 금지)
+data/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
