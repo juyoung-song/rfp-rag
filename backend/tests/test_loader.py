@@ -30,11 +30,13 @@ def test_pdfplumber_loader_text_contains_korean(sample_pdf_path):
     assert any('가' <= ch <= '힣' for ch in text)
 
 
-def test_opendataloader_returns_text(sample_pdf_path, tmp_path):
+def test_opendataloader_returns_markdown(sample_pdf_path, tmp_path):
     loader = OpenDataLoaderLoader(output_dir=tmp_path)
     text = loader.load(sample_pdf_path)
     assert isinstance(text, str)
     assert len(text) > 100
+    # markdown 포맷 확인: 헤딩(#) 또는 표(|) 포함
+    assert '#' in text or '|' in text
 
 
 def test_opendataloader_text_contains_korean(sample_pdf_path, tmp_path):
