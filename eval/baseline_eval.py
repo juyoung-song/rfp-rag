@@ -94,6 +94,8 @@ def main():
     parser.add_argument("--output", type=Path, default=Path("../eval/results/baseline.json"))
     parser.add_argument("--top-k", type=int, default=5)
     parser.add_argument("--collection", type=str, default=settings.chroma_collection_name)
+    parser.add_argument("--questions-version", type=str, default="")
+    parser.add_argument("--pipeline-version", type=str, default="phase1-naive")
     args = parser.parse_args()
 
     questions = json.loads(args.questions.read_text(encoding="utf-8"))
@@ -126,6 +128,9 @@ def main():
 
     output = {
         "eval_date": datetime.now().isoformat(),
+        "pipeline_version": args.pipeline_version,
+        "questions_version": args.questions_version or args.questions.stem,
+        "questions_file": str(args.questions),
         "top_k": args.top_k,
         "total_chunks_in_db": total_chunks,
         "summary": summary,
