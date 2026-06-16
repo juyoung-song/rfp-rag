@@ -1,5 +1,7 @@
 import pytest
 from pipeline.loader.pymupdf_loader import PyMuPDFLoader
+from pipeline.loader.pdfplumber_loader import PdfplumberLoader
+from pipeline.loader.opendataloader_loader import OpenDataLoaderLoader
 
 
 def test_pymupdf_loader_returns_text(sample_pdf_path):
@@ -11,5 +13,31 @@ def test_pymupdf_loader_returns_text(sample_pdf_path):
 
 def test_pymupdf_loader_text_contains_korean(sample_pdf_path):
     loader = PyMuPDFLoader()
+    text = loader.load(sample_pdf_path)
+    assert any('가' <= ch <= '힣' for ch in text)
+
+
+def test_pdfplumber_loader_returns_text(sample_pdf_path):
+    loader = PdfplumberLoader()
+    text = loader.load(sample_pdf_path)
+    assert isinstance(text, str)
+    assert len(text) > 100
+
+
+def test_pdfplumber_loader_text_contains_korean(sample_pdf_path):
+    loader = PdfplumberLoader()
+    text = loader.load(sample_pdf_path)
+    assert any('가' <= ch <= '힣' for ch in text)
+
+
+def test_opendataloader_returns_text(sample_pdf_path, tmp_path):
+    loader = OpenDataLoaderLoader(output_dir=tmp_path)
+    text = loader.load(sample_pdf_path)
+    assert isinstance(text, str)
+    assert len(text) > 100
+
+
+def test_opendataloader_text_contains_korean(sample_pdf_path, tmp_path):
+    loader = OpenDataLoaderLoader(output_dir=tmp_path)
     text = loader.load(sample_pdf_path)
     assert any('가' <= ch <= '힣' for ch in text)
