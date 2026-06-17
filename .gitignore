@@ -16,6 +16,9 @@ env/
 # 데이터 파일 (원본 RFP 문서 - 외부 공유 금지)
 data/
 
+# 벡터 DB 데이터 (RFP 원문 청크 포함 - 외부 공유 금지)
+backend/chroma_data/
+
 # IDE
 .vscode/
 .idea/
