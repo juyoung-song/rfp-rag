@@ -28,7 +28,7 @@ def main():
         print(f"기존 DB에 {existing}개 청크 존재 → 초기화 후 재인제스트")
         chroma.reset()
 
-    meta_csv = data_dir / "metadata.csv"
+    meta_csv = data_dir / "data_list.csv"
     meta_loader = MetadataLoader(meta_csv) if meta_csv.exists() else None
 
     pipeline = IngestPipeline(

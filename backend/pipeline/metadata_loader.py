@@ -1,5 +1,10 @@
 from pathlib import Path
+import unicodedata
 import pandas as pd
+
+
+def _nfc_stem(filename: str) -> str:
+    return unicodedata.normalize("NFC", Path(filename).stem).strip()
 
 
 class MetadataLoader:
@@ -14,7 +19,8 @@ class MetadataLoader:
 
     def get_by_filename(self, filename: str) -> dict | None:
         df = self.load()
-        matches = df[df["파일명"] == filename]
+        target = _nfc_stem(filename)
+        matches = df[df["파일명"].apply(_nfc_stem) == target]
         if matches.empty:
             return None
         return matches.iloc[0].to_dict()
