@@ -9,9 +9,30 @@ _SYSTEM_PROMPT = """당신은 RFP(제안요청서) 문서 분석 전문가입니
 답변은 한국어로 작성하세요."""
 
 
-def _build_context_block(chunks: list[str]) -> str:
-    sections = "\n\n---\n\n".join(f"[문서 {i+1}]\n{chunk}" for i, chunk in enumerate(chunks))
-    return f"## 참조 문서\n\n{sections}"
+_META_FIELDS = [
+    ("입찰 참여 마감일", "제안서 제출 마감일"),
+    ("입찰 참여 시작일", "입찰 참여 시작일"),
+    ("사업 금액", "사업 금액"),
+    ("발주 기관", "발주 기관"),
+    ("사업명", "사업명"),
+]
+
+
+def _build_context_block(chunks: list[str], metadatas: list[dict] | None = None) -> str:
+    sections = []
+    seen_meta: set[str] = set()
+    for i, chunk in enumerate(chunks):
+        meta_lines = []
+        if metadatas and i < len(metadatas):
+            m = metadatas[i]
+            for key, label in _META_FIELDS:
+                val = m.get(key, "")
+                if val and val not in ("nan", "None") and val not in seen_meta:
+                    meta_lines.append(f"{label}: {val}")
+                    seen_meta.add(val)
+        meta_block = ("\n".join(meta_lines) + "\n") if meta_lines else ""
+        sections.append(f"[문서 {i+1}]\n{meta_block}{chunk}")
+    return "## 참조 문서\n\n" + "\n\n---\n\n".join(sections)
 
 
 class OpenAIGenerator(BaseGenerator):
@@ -24,6 +45,7 @@ class OpenAIGenerator(BaseGenerator):
         query: str,
         context_chunks: list[str],
         history: list[Message] | None = None,
+        context_metadata: list[dict] | None = None,
     ) -> GeneratorResponse:
         messages: list[dict] = [{"role": "system", "content": _SYSTEM_PROMPT}]
 
@@ -31,7 +53,7 @@ class OpenAIGenerator(BaseGenerator):
             for msg in history:
                 messages.append({"role": msg.role, "content": msg.content})
 
-        context_block = _build_context_block(context_chunks)
+        context_block = _build_context_block(context_chunks, context_metadata)
         user_content = f"{context_block}\n\n## 질문\n\n{query}"
         messages.append({"role": "user", "content": user_content})
 

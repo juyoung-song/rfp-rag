@@ -107,7 +107,12 @@ def run_evaluation(
         query_vec = embedder.embed(question)
         retrieved = retriever.retrieve(query_vec, top_k=top_k)
         context_chunks = [r.text for r in retrieved]
-        gen_result = generator.generate(query=question, context_chunks=context_chunks)
+        context_metadata = [r.metadata for r in retrieved]
+        gen_result = generator.generate(
+            query=question,
+            context_chunks=context_chunks,
+            context_metadata=context_metadata,
+        )
         elapsed = time.time() - t0
 
         hit_rate = keyword_hit_rate(gen_result.answer, expected_kw)
