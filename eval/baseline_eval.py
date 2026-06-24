@@ -4,7 +4,7 @@ Phase 1 Naive RAG 베이스라인 평가 스크립트
 사용법:
     cd backend
     python ../eval/baseline_eval.py \
-        --questions ../eval/questions_v2.json \
+        --questions ../eval/questions_v1.json \
         --output ../eval/results/baseline_YYYYMMDD.json \
         --top-k 5
         [--no-judge]  # LLM-as-Judge 생략 시
@@ -169,7 +169,7 @@ def summarize(results: list[dict]) -> dict:
 def main():
     parser = argparse.ArgumentParser(description="Phase 1 Naive RAG 베이스라인 평가")
     parser.add_argument("--data-dir", type=Path, default=Path("../data"))
-    parser.add_argument("--questions", type=Path, default=Path("../eval/questions_v2.json"))
+    parser.add_argument("--questions", type=Path, default=Path("../eval/questions_v1.json"))
     parser.add_argument("--output", type=Path, default=Path("../eval/results/baseline.json"))
     parser.add_argument("--top-k", type=int, default=5)
     parser.add_argument("--collection", type=str, default=settings.chroma_collection_name)
