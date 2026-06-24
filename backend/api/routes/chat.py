@@ -48,6 +48,7 @@ def chat(
         query=req.query,
         context_chunks=[r.text for r in retrieved],
         history=history,
+        context_metadata=[r.metadata for r in retrieved],
     )
 
     return ChatResponse(
