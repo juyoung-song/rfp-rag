@@ -28,18 +28,27 @@ from pipeline.generator.openai_generator import OpenAIGenerator
 # ── Judge 프롬프트 ────────────────────────────────────────────────────────────
 
 _JUDGE_SYSTEM = """당신은 RAG 시스템의 답변 품질을 평가하는 전문가입니다.
-주어진 질문, 검색된 컨텍스트, 생성된 답변을 보고 아래 기준으로 0~3점을 부여하세요.
+주어진 카테고리, 질문, 검색된 컨텍스트, 생성된 답변을 보고 아래 기준으로 0~3점을 부여하세요.
 
-[평가 기준]
+[일반 질문 평가 기준] (카테고리가 단일_문서_추출 또는 멀티_문서_비교인 경우)
 3점: 컨텍스트 기반으로 질문에 정확하게 답변. 핵심 정보 포함.
 2점: 대체로 정확하나 일부 정보 누락 또는 불명확.
 1점: 질문과 관련 있으나 핵심 정보 오류 또는 중요 내용 누락.
 0점: 완전히 잘못된 답변이거나 "찾을 수 없습니다"류 무응답.
 
+[Negative case 평가 기준] (카테고리가 Negative_case인 경우)
+3점: 문서에 해당 정보가 없다고 명확히 답변 ("찾을 수 없습니다", "포함되어 있지 않습니다" 등).
+2점: 모른다고 답하나 근거 없는 추측을 일부 포함.
+1점: 불확실하게 모른다고 하면서 부분적으로 틀린 정보를 제공.
+0점: 존재하지 않는 정보를 사실인 것처럼 답변 (할루시네이션).
+
 반드시 아래 JSON 형식으로만 응답하세요:
 {"score": <0~3 정수>, "reason": "<한 문장 판단 근거>"}"""
 
-_JUDGE_USER = """[질문]
+_JUDGE_USER = """[카테고리]
+{category}
+
+[질문]
 {question}
 
 [검색된 컨텍스트]
@@ -54,10 +63,12 @@ def llm_judge(
     question: str,
     context_chunks: list[str],
     answer: str,
+    category: str = "",
 ) -> dict:
     """LLM-as-Judge: 답변 품질을 0~3점으로 평가. {"score": int, "reason": str} 반환."""
     context_text = "\n---\n".join(f"[{i+1}] {c[:300]}" for i, c in enumerate(context_chunks))
     user_msg = _JUDGE_USER.format(
+        category=category or "단일_문서_추출",
         question=question,
         context=context_text,
         answer=answer,
@@ -133,7 +144,7 @@ def run_evaluation(
         }
 
         if judge_client is not None:
-            judge_result = llm_judge(judge_client, question, context_chunks, gen_result.answer)
+            judge_result = llm_judge(judge_client, question, context_chunks, gen_result.answer, q.get("category", ""))
             row["judge_score"] = round(judge_result["score"] / 3, 4)   # 0-1 정규화
             row["judge_score_raw"] = judge_result["score"]              # 0-3 원점수
             row["judge_reason"] = judge_result["reason"]
