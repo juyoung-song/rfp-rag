@@ -16,6 +16,11 @@ env/
 # 데이터 파일 (원본 RFP 문서 - 외부 공유 금지)
 data/
 
+# 평가 데이터셋 (RFP 원문 내용 포함 - 외부 공유 금지)
+eval/testset_v1.json
+eval/knowledge_graph.pkl
+eval/odl_output/
+
 # 벡터 DB 데이터 (RFP 원문 청크 포함 - 외부 공유 금지)
 backend/chroma_data/
 
